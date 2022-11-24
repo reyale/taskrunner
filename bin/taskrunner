@@ -1,0 +1,14 @@
+#!/usr/bin/python3
+
+import argparse
+
+
+def run():
+    parser = argparse.ArgumentParser(description='taskrunner')
+    parser.add_argument('--dry-run', default=None)
+
+    args = parser.parse_args()
+
+
+if __name__ == "__main__":
+    run()
