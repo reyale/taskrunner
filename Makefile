@@ -1,4 +1,3 @@
 all:
-	flake8 ./bin/*
-	flake8 ./lib/*
-
+	pytest ./test.py
+	flake8 ./bin/* ./lib/*

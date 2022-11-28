@@ -1,10 +1,11 @@
 import shelve
+import Fname
 
 
 class Taskrunner:
 
-    def __init__(self, args):
-        pass
+    def __init__(self, config_fname):
+         
 
     def run(self, time):
         pass

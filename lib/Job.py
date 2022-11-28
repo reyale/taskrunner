@@ -19,7 +19,7 @@ class Job:
     def __init__(self, name, timezone, start_time, provides, end_time=None):
         assert(type(provides) == type(dependency))
 
-        self.name = name 
+        self.name = name
         self.timezone = timezone
         self.start_time = start_time
         self.provides = provides

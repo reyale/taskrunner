@@ -1,0 +1,4 @@
+{
+  "store_fname": "./var/unittest.store",
+  "job_config": "./cfg/jobs.json"
+}
