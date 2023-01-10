@@ -32,10 +32,22 @@ def test_config():
 def test_job():
     now = create_dt('12:00:00')
 
+    # time to run!
     provides = Job.file_dependency('./cfg/data/does_not_exist')
     job = Job.Job('j1', create_dt('11:00:00'), provides) 
     assert(job.would_run(now) == True)
 
+    # not time yet
     provides = Job.file_dependency('./cfg/data/does_not_exist')
     job = Job.Job('j2', create_dt('13:00:00'), provides)
+    assert(job.would_run(now) == False)
+
+    # already provided
+    provides = Job.file_dependency('./cfg/data/provided')
+    job = Job.Job('j3', create_dt('11:00:00'), provides)
+    assert(job.would_run(now) == False)
+
+    # passed end time
+    provides = Job.file_dependency('./cfg/data/does_not_exist')
+    job = Job.Job('j4', create_dt('11:00:00'), provides, create_dt('11:30:00'))
     assert(job.would_run(now) == False)
