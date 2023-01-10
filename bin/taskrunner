@@ -1,13 +1,21 @@
 #!/usr/bin/python3
 
 import argparse
+import sys
+import os
+
+sys.path.append(os.path.join(os.path.abspath(os.path.dirname(__file__)), '../lib'))
+import Config
+import Taskrunner
 
 
 def run():
     parser = argparse.ArgumentParser(description='taskrunner')
-    parser.add_argument('--dry-run', default=None)
-
+    parser.add_argument('--dry-run', default=False)
+    parser.add_argument('--config', required=True) 
     args = parser.parse_args()
+
+    taskrunner = Taskrunner.Taskrunner(args.config)
 
 
 if __name__ == "__main__":
