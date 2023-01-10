@@ -26,7 +26,13 @@ def create_dependency(dep_type, **kwargs):
 
 class Job:
     def __init__(self, name, start_time, provides, end_time=None):
-        assert(type(provides) == type(dependency))
+        assert(issubclass(type(provides), dependency))
+
+        if start_time.tzinfo is None:
+            raise AssertionError('start time must have tz aware dt')
+
+        if end_time is not None and end_time.tzinfo is None:
+            raise AssertionError('end time must have tz aware dt')
 
         self.name = name
         self.start_time = start_time
@@ -46,16 +52,15 @@ class Job:
 
     def would_run(self, time):
         if time.tzinfo is None:
-            raise AssertionError('would_run muts be called with tz aware dt')
+            raise AssertionError('would_run must be called with tz aware dt')
 
         if self.provides.exists(time):
             return False
 
-        now = datetime.datetime.now()
-        if now < self.start_time:
+        if time < self.start_time:
             return False
 
-        if self.end_time and now > self.end_time:
+        if self.end_time and time > self.end_time:
             return False
 
         if self.dependencies:

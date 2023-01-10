@@ -1,8 +1,16 @@
 import sys
 import datetime
+import pytz
 sys.path.append('./lib')
 import Config
 import Fname
+import Job
+
+
+def create_dt(dt_str):
+    now = datetime.datetime.strptime(dt_str, '%H:%M:%S')
+    now = now.replace(tzinfo=pytz.UTC)
+    return now
 
 
 def test_fname():
@@ -19,3 +27,15 @@ def test_config():
     cfg = Config.Config('./cfg/unittest.json')
     assert(cfg.exists('store_fname'))
     assert(cfg.exists('job_config'))
+
+
+def test_job():
+    now = create_dt('12:00:00')
+
+    provides = Job.file_dependency('./cfg/data/does_not_exist')
+    job = Job.Job('j1', create_dt('11:00:00'), provides) 
+    assert(job.would_run(now) == True)
+
+    provides = Job.file_dependency('./cfg/data/does_not_exist')
+    job = Job.Job('j2', create_dt('13:00:00'), provides)
+    assert(job.would_run(now) == False)
