@@ -11,11 +11,17 @@ import Taskrunner
 
 def run():
     parser = argparse.ArgumentParser(description='taskrunner')
-    parser.add_argument('--dry-run', default=False)
+    parser.add_argument('--dry-run', required=False, default=False)
     parser.add_argument('--config', required=True) 
+    parser.add_argument('--time', required=False, default=None) 
     args = parser.parse_args()
 
+    run_time = Taskrunner.current_time()
+    if args.time is not None:
+        run_time = Taskrunner.parse_time(args.time)  #TODO - could allow passing of tzinfo as well
+
     taskrunner = Taskrunner.Taskrunner(args.config)
+    taskrunner.run(run_time, args.dry_run)
 
 
 if __name__ == "__main__":

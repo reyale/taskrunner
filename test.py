@@ -1,3 +1,4 @@
+import os
 import sys
 import datetime
 import pytz
@@ -5,6 +6,7 @@ sys.path.append('./lib')
 import Config
 import Fname
 import Job
+import Logger
 
 
 def create_dt(dt_str):
@@ -51,3 +53,15 @@ def test_job():
     provides = Job.file_dependency('./cfg/data/does_not_exist')
     job = Job.Job('j4', create_dt('11:00:00'), provides, create_dt('11:30:00'))
     assert(job.would_run(now) == False)
+
+def test_file_logger():
+    fname = './var/unittest/test.log'
+    if os.path.exists(fname):
+        os.remove(fname)
+
+    l1 = Logger.create('test', filename=fname)
+    l1.debug('debug') 
+    l1.info('info') 
+    l1.warning('warning') 
+    l1.error('error')
+    l1.critical('critical')

@@ -1,0 +1,4 @@
+{
+  "store_fname": "./var/dev.store",
+  "job_config": "./cfg/dev-jobs.json"
+}
