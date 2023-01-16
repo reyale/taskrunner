@@ -2,6 +2,7 @@ import shelve
 import Config
 from dateutil.tz import tzlocal
 import datetime
+import Logger
 
 
 _time_format = '%H:%M:%S'
@@ -27,6 +28,9 @@ class Taskrunner:
 
     def __init__(self, config_fname):
         self.config = Config.Config(config_fname)
+        self.logger = Logger.create(__name__, filename=self.config.get('log_fname'))
+        self.logger.info('config_fname=' + config_fname)
+
         self.state = shelve.open(self.config.get('store_fname'))
         self._init_jobs(self.config.get('job_config'))
 
@@ -38,11 +42,16 @@ class Taskrunner:
 
     def run(self, time, dryrun=False):
         for name, state in self.state:
-            if state.would_run(time):
-                if dryrun:
-                    print('dryrun', name, state)
-                else:
-                    print('run', name, state)
+            self.run_one(time, dryrun)
 
-    def run_one(self, time, job_name):
-        pass
+    def run_one(self, name, time, dryrun=False):
+        if name not in self.state:
+            return
+
+        state = self.state[name]
+
+        if state.would_run(time):
+            if dryrun:
+                self.logger.info('dryrun name=%s state=%s' % (name, str(state)))
+            else:
+                self.logger.info('run name=%s state=%s' % (name, str(state)))

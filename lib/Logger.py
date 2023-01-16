@@ -23,8 +23,8 @@ class Logger(logging.Logger):
             raise AssertionError('you tried to create a logger twice with name=' + name)
 
         self.logger = logging.getLogger(name)
+        self.logger.setLevel(get_level(kwargs.get('level', 'DEBUG')))
         handler = get_handler(kwargs.get('type', 'file'), kwargs)
-        handler.setLevel(get_level(kwargs.get('level', 'DEBUG')))
 
         format_str = kwargs.get('format_string', '%(asctime)s - %(name)s - %(levelname)s - %(message)s')
         formatter = logging.Formatter(format_str)
