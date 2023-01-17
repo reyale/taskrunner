@@ -73,3 +73,4 @@ class Taskrunner:
                 self.logger.info('dryrun name=%s state=%s' % (name, str(state)))
             else:
                 self.logger.info('run name=%s state=%s' % (name, str(state)))
+                state.last_run = current_time()
