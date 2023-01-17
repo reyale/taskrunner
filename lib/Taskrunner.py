@@ -1,9 +1,12 @@
+import os
 import shelve
+import threading
 import Config
 from dateutil.tz import tzlocal
 import datetime
 import Logger
 import Job
+from filelock import FileLock, FileLockException
 
 _time_format = '%H:%M:%S'
 
@@ -28,6 +31,7 @@ class Taskrunner:
 
     def __init__(self, config_fname):
         self.config = Config.Config(config_fname)
+        self.var_dir = self.config.get('var_dir')
         self.logger = Logger.create(__name__, filename=self.config.get('log_fname'))
         self.logger.info('config_fname=' + config_fname)
 
@@ -72,5 +76,17 @@ class Taskrunner:
             if dryrun:
                 self.logger.info('dryrun name=%s state=%s' % (name, str(state)))
             else:
-                self.logger.info('run name=%s state=%s' % (name, str(state)))
-                state.last_run = current_time()
+                self.run_task(state)
+
+    def run_task(self, state):
+        def run_background(job_state):
+            try:
+                with FileLock(os.path.join(self.var_dir, job_state.name+'.lock')):
+                    self.logger.info('run name=%s state=%s' % (job_state.name, str(job_state)))
+                    # TODO - run the command
+                    job_state.last_run = current_time()
+            except FileLockException:
+                self.logger.warn('job name=%s failed to acquire job lock' % (job_state.name))
+
+        t1 = threading.Thread(target=run_background, args=[state])
+        t1.start()
