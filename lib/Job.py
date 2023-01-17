@@ -2,6 +2,9 @@ import os
 import Fname
 import pytz
 import datetime
+import glob
+
+import Config
 
 
 class dependency:
@@ -21,7 +24,7 @@ class file_dependency(dependency):
 
 
 def create_dependency(dep_type, **kwargs):
-    return eval(dep_type, *kwargs)
+    return globals()[dep_type](*kwargs)
 
 
 class Job:
@@ -73,7 +76,7 @@ class Job:
 
 def create_datetime(dtstr, timezone):
     timezone = pytz.timezone(timezone)
-    dt = datetime.datetime.strptime(dtstr, '%H%m%s')
+    dt = datetime.datetime.strptime(dtstr, '%H:%M:%S')
     return timezone.localize(dt)
 
 
@@ -83,7 +86,7 @@ def create_job_from_config(config):
     start_dt = create_datetime(config.get('start_time'), timezone_str)
 
     # for now all provides are files
-    provides = create_dependency('file_dependency', config.get('provides_fname'))
+    provides = create_dependency('file_dependency', fname=config.get('provides_fname'))
     end_dt = None
     if config.exists('end_time'):
         end_dt = create_datetime(config.get('end_time'), timezone_str)
@@ -92,6 +95,19 @@ def create_job_from_config(config):
     if config.exists('dependencies'):
         deps = config.get('dependencies')
         for dep in deps:
-            job.add_dependency(create_dependency(dep['type'], dep))
+            job.add_dependency(create_dependency(dep['type'], *dep))
 
     return job
+
+
+def create_jobs(job_config_dir):
+    job_config_fnames = glob.glob(job_config_dir + '/*.json')
+    if len(job_config_fnames) <= 0:
+        raise AssertionError('no jobs to load')
+
+    results = []
+    for fname in job_config_fnames:
+        cfg = Config.Config(fname)
+        results.append(create_job_from_config(cfg))
+
+    return results

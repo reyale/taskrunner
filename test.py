@@ -54,6 +54,12 @@ def test_job():
     job = Job.Job('j4', create_dt('11:00:00'), provides, create_dt('11:30:00'))
     assert(job.would_run(now) == False)
 
+
+def test_job_from_config():
+    jobs_dir = './cfg/unittestjobs/'
+    jobs = Job.create_jobs(jobs_dir)
+    assert(len(jobs) > 0) 
+
 def test_file_logger():
     fname = './var/unittest/test.log'
     if os.path.exists(fname):

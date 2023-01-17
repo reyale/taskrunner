@@ -38,7 +38,10 @@ class Taskrunner:
         self.state.close()
 
     def _init_jobs(self, job_config):
-        pass
+        jcfg = Config.Config(job_config)
+        jobs = jcfg.get('jobs')
+        for job in jobs:
+            print(job)
 
     def run(self, time, dryrun=False):
         for name, state in self.state:
