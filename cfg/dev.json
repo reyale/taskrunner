@@ -1,5 +1,5 @@
 {
   "store_fname": "./var/dev.store",
-  "job_config": "./cfg/dev-jobs.json",
+  "job_config_dir": "./cfg/devjobs",
   "log_fname": "./var/dev.log"
 }

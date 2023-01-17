@@ -1,0 +1,7 @@
+    {
+      "name": "Job1",
+      "timezone": "America/New_York",
+      "file_dependency": "./dependency",
+      "start_time": "09:30:00",
+      "provides_fname": "./generated"
+    }
