@@ -1,6 +1,6 @@
 simple cron wrapper 
 
-`*/5 * * * * taskrunner`
+`*/1 * * * * taskrunner`
 
 # testing and stuff
 
