@@ -34,7 +34,7 @@ class Taskrunner:
         self.config = Config.Config(config_fname)
         self.var_dir = self.config.get('var_dir')
         self.logger = Logger.create(__name__, filename=self.config.get('log_fname'))
-        self.logger.info('taskrunner start config_fname=%s var_dir=%s'  % (config_fname, self.var_dir))
+        self.logger.info('taskrunner start config_fname=%s var_dir=%s' % (config_fname, self.var_dir))
 
         self.state = shelve.open(self.config.get('store_fname'))
         self._init_jobs(self.config.get('job_config_dir'))
@@ -76,7 +76,7 @@ class Taskrunner:
 
         if self.state[name].would_run(time):
             if dryrun:
-                self.logger.info('dryrun name=%s state=%s' % (name, self.state[name])) 
+                self.logger.info('dryrun name=%s state=%s' % (name, self.state[name]))
             else:
                 self._run_task(name)
 
@@ -88,10 +88,6 @@ class Taskrunner:
                 self.state[name].last_run = current_time()
         except FileLockException:
             self.logger.warn('job name=%s failed to acquire job lock' % (name))
-
-    def _real_background_member(self, name):
-        import time
-        time.sleep(10)
 
     def _run_task(self, name):
         self.threads.append(threading.Thread(target=self._run_background, args=(name,)))
