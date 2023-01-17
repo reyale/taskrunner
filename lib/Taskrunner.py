@@ -57,10 +57,8 @@ class Taskrunner:
             if name in self.state:
                 # update existing
                 self.logger.info('updating job name=%s old=%s new=%s' % (name, str(self.state[name]), str(job)))
-                self.state[name].start_time = job.start_time
-                self.state[name].provides = job.provides
-                self.state[name].end_time = job.end_time
-                self.state[name].dependencies = job.dependencies
+                job.last_run = self.state[name].last_run
+                self.state[name] = job
                 # intentionally not updating last run
             else:
                 self.state[name] = job
@@ -85,7 +83,9 @@ class Taskrunner:
             with FileLock(os.path.join(self.var_dir, name + '.lock')):
                 self.logger.info('run name=%s state=%s' % (name, str(self.state[name])))
                 # TODO - run the command
-                self.state[name].last_run = current_time()
+                state = self.state[name]
+                state.last_run = current_time()
+                self.state[name] = state
         except FileLockException:
             self.logger.warn('job name=%s failed to acquire job lock' % (name))
 
