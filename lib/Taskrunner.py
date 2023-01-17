@@ -30,15 +30,19 @@ def parse_time(time_str, tz=tzlocal()):
 class Taskrunner:
 
     def __init__(self, config_fname):
+        self.threads = []  # at most we have the number of threads as jobs
         self.config = Config.Config(config_fname)
         self.var_dir = self.config.get('var_dir')
         self.logger = Logger.create(__name__, filename=self.config.get('log_fname'))
-        self.logger.info('config_fname=' + config_fname)
+        self.logger.info('taskrunner start config_fname=%s var_dir=%s'  % (config_fname, self.var_dir))
 
         self.state = shelve.open(self.config.get('store_fname'))
         self._init_jobs(self.config.get('job_config_dir'))
 
-    def __del__(self):
+    def stop(self):
+        for t in self.threads:
+            t.join()
+
         self.state.close()
 
     def _init_jobs(self, job_config_dir):
@@ -70,23 +74,25 @@ class Taskrunner:
         if name not in self.state:
             return
 
-        state = self.state[name]
-
-        if state.would_run(time):
+        if self.state[name].would_run(time):
             if dryrun:
-                self.logger.info('dryrun name=%s state=%s' % (name, str(state)))
+                self.logger.info('dryrun name=%s state=%s' % (name, self.state[name])) 
             else:
-                self.run_task(state)
+                self._run_task(name)
 
-    def run_task(self, state):
-        def run_background(job_state):
-            try:
-                with FileLock(os.path.join(self.var_dir, job_state.name+'.lock')):
-                    self.logger.info('run name=%s state=%s' % (job_state.name, str(job_state)))
-                    # TODO - run the command
-                    job_state.last_run = current_time()
-            except FileLockException:
-                self.logger.warn('job name=%s failed to acquire job lock' % (job_state.name))
+    def _run_background(self, name):
+        try:
+            with FileLock(os.path.join(self.var_dir, name + '.lock')):
+                self.logger.info('run name=%s state=%s' % (name, str(self.state[name])))
+                # TODO - run the command
+                self.state[name].last_run = current_time()
+        except FileLockException:
+            self.logger.warn('job name=%s failed to acquire job lock' % (name))
 
-        t1 = threading.Thread(target=run_background, args=[state])
-        t1.start()
+    def _real_background_member(self, name):
+        import time
+        time.sleep(10)
+
+    def _run_task(self, name):
+        self.threads.append(threading.Thread(target=self._run_background, args=(name,)))
+        self.threads[-1].start()

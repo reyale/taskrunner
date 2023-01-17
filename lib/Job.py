@@ -45,7 +45,7 @@ class Job:
         self.last_run = None
 
     def __str__(self):
-        result = 'name=%s start_time=%s provides=(%s) end_time=%s' % (self.name, str(self.start_time), str(self.provides), str(self.end_time))
+        result = 'name=%s start_time=%s provides=(%s) end_time=%s last_run=%s' % (self.name, str(self.start_time), str(self.provides), str(self.end_time), str(self.last_run))
         for dep in self.dependencies:
             result += ' ' + str(dep)
 

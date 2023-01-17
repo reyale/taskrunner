@@ -22,7 +22,7 @@ def run():
 
     taskrunner = Taskrunner.Taskrunner(args.config)
     taskrunner.run(run_time, args.dry_run)
-
+    taskrunner.stop()  # we do not use __del__ because it somehow does not play nice with threads running as member variables 
 
 if __name__ == "__main__":
     run()
