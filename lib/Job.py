@@ -19,6 +19,9 @@ class file_dependency(dependency):
     def __str__(self):
         return 'type=%s fname=%s' % (__name__, self.fname)
 
+    def __eq__(self, other):
+        return self.fname == other.fname
+
     def exists(self, time):
         return os.path.exists(Fname.render(self.fname, time))
 
@@ -50,6 +53,24 @@ class Job:
             result += ' ' + str(dep)
 
         return result
+
+    def __eq__(self, other):
+        if self.name != other.name:
+            return False
+
+        if self.start_time != other.start_time:
+            return False
+
+        if self.provides != other.provides:
+            return False
+
+        if self.end_time != other.end_time:
+            return False
+
+        if self.dependencies != other.dependencies:
+            return False
+
+        return True
 
     def add_dependency(self, provide):
         self.dependencies.append(provide)

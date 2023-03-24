@@ -55,8 +55,12 @@ class Taskrunner:
             name = job.name
 
             if name in self.state:
+                if job == self.state[name]:
+                    self.logger.info('no update job={}'.format(job.name))
+                    continue
+
                 # update existing
-                self.logger.info('updating job name=%s old=%s new=%s' % (name, str(self.state[name]), str(job)))
+                self.logger.info('updating job name=%s \nold=%s \nnew=%s' % (name, str(self.state[name]), str(job)))
                 job.last_run = self.state[name].last_run
                 self.state[name] = job
                 # intentionally not updating last run
