@@ -56,7 +56,7 @@ class Taskrunner:
 
             if name in self.state:
                 if job == self.state[name]:
-                    self.logger.info('no update job={}'.format(job.name))
+                    self.logger.info('no update to job={} configuration'.format(job.name))
                     continue
 
                 # update existing
